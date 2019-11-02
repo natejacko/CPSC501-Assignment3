@@ -48,6 +48,16 @@ public class Deserializer
         HashMap<String, Object> instances = new HashMap<String, Object>();
         
         // Create instances
+        deserializeInstances(instances, elements);
+        
+        // Assign fields in instances
+        deserializeFields(instances, elements);
+        
+        return instances.get("0");
+    }
+    
+    private void deserializeInstances(HashMap<String, Object> instances, List<Element> elements)
+    {
         for (Element e : elements)
         {
             Object obj = null;
@@ -90,8 +100,10 @@ public class Deserializer
             
             instances.put(e.getAttributeValue("id"), obj);
         }
-        
-        // Assign fields in instances
+    }
+    
+    private void deserializeFields(HashMap<String, Object> instances, List<Element> elements)
+    {
         for (Element e : elements)
         {
            Object obj = instances.get(e.getAttributeValue("id"));
@@ -102,54 +114,21 @@ public class Deserializer
            }
            
            Class objClass = obj.getClass();
+           if (Modifier.isTransient(objClass.getModifiers()))
+           {
+               continue;
+           }
+           
            List<Element> children = e.getChildren();
+           // TODO
+           // If traversal up superclass to set inherited fields, may need to utilize declaringclass attribute
+           // instead of just using the object class
            if (objClass.isArray())
            {
                for (int i = 0; i < Array.getLength(obj); i++)
                {
                    Element c = children.get(i);
-                   String value = c.getText();
-                   if (c.getName().equals("value"))
-                   {
-                       // Check field type and parse string as type to set
-                       Class componentType = objClass.getComponentType();
-                       if (componentType.equals(boolean.class))
-                       {
-                           Array.set(obj, i, Boolean.valueOf(value));
-                       }
-                       else if (componentType.equals(byte.class))
-                       {
-                           Array.set(obj, i, Byte.valueOf(value));
-                       }
-                       else if (componentType.equals(short.class))
-                       {
-                           Array.set(obj, i, Short.valueOf(value));
-                       }
-                       else if (componentType.equals(int.class))
-                       {
-                           Array.set(obj, i, Integer.valueOf(value));
-                       }
-                       else if (componentType.equals(long.class))
-                       {
-                           Array.set(obj, i, Long.valueOf(value));
-                       }
-                       else if (componentType.equals(float.class))
-                       {
-                           Array.set(obj, i, Float.valueOf(value));
-                       }
-                       else if (componentType.equals(double.class))
-                       {
-                           Array.set(obj, i, Double.valueOf(value));
-                       }
-                       else if (componentType.equals(char.class))
-                       {
-                           Array.set(obj, i, value.charAt(0));
-                       }
-                   }
-                   else
-                   {
-                       Array.set(obj, i, instances.get(value));
-                   }
+                   Array.set(obj, i, getValueFromElement(c, obj, objClass.getComponentType(), instances));
                }
            }
            else
@@ -159,57 +138,17 @@ public class Deserializer
                    String fieldName = c.getAttributeValue("name");
                    try
                    {
-                       // TODO
-                       // If traversal up superclass to set inherited fields, may need to utilize declaringclass attribute
-                       // instead of just using the object class
                        Field f = objClass.getDeclaredField(fieldName);
+                       if (Modifier.isTransient(f.getModifiers()))
+                       {
+                           continue;
+                       }
                        if (!Modifier.isPublic(f.getModifiers()))
                        {
                            f.setAccessible(true);
                        }
                        Element fieldElement = c.getChildren().get(0);
-                       String value = fieldElement.getText();
-                       if (fieldElement.getName().equals("value"))
-                       {
-                           // Check field type and parse string as type to set
-                           Class fieldType = f.getType();
-                           if (fieldType.equals(boolean.class))
-                           {
-                               f.set(obj, Boolean.valueOf(value));
-                           }
-                           else if (fieldType.equals(byte.class))
-                           {
-                               f.set(obj, Byte.valueOf(value));
-                           }
-                           else if (fieldType.equals(short.class))
-                           {
-                               f.set(obj, Short.valueOf(value));
-                           }
-                           else if (fieldType.equals(int.class))
-                           {
-                               f.set(obj, Integer.valueOf(value));
-                           }
-                           else if (fieldType.equals(long.class))
-                           {
-                               f.set(obj, Long.valueOf(value));
-                           }
-                           else if (fieldType.equals(float.class))
-                           {
-                               f.set(obj, Float.valueOf(value));
-                           }
-                           else if (fieldType.equals(double.class))
-                           {
-                               f.set(obj, Double.valueOf(value));
-                           }
-                           else if (fieldType.equals(char.class))
-                           {
-                               f.set(obj, value.charAt(0));
-                           }
-                       }
-                       else
-                       {
-                           f.set(obj, instances.get(value));
-                       }
+                       f.set(obj, getValueFromElement(fieldElement, obj, f.getType(), instances));
                    } 
                    catch (Exception ex)
                    {
@@ -219,7 +158,54 @@ public class Deserializer
                }
            }
         }
-        
-        return instances.get("0");
+    }
+    
+    private Object getValueFromElement(Element e, Object obj, Class c, HashMap<String, Object> instances)
+    {
+        String value = e.getText();
+        if (e.getName().equals("value"))
+        {
+            if (c.equals(boolean.class))
+            {
+                return Boolean.valueOf(value);
+            }
+            else if (c.equals(byte.class))
+            {
+                return Byte.valueOf(value);
+            }
+            else if (c.equals(short.class))
+            {
+                return Short.valueOf(value);
+            }
+            else if (c.equals(int.class))
+            {
+                return Integer.valueOf(value);
+            }
+            else if (c.equals(long.class))
+            {
+                return Long.valueOf(value);
+            }
+            else if (c.equals(float.class))
+            {
+                return Float.valueOf(value);
+            }
+            else if (c.equals(double.class))
+            {
+                return Double.valueOf(value);
+            }
+            else if (c.equals(char.class))
+            {
+                return value.charAt(0);
+            }
+            else
+            {
+                // This shouldn't ever be hit since primitives aren't nullable. Just putting in to compile
+                return null;
+            }
+        }
+        else
+        {
+            return instances.get(value);
+        }
     }
 }

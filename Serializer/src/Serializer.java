@@ -6,7 +6,6 @@ import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 
 import org.jdom2.*;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
