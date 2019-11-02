@@ -16,11 +16,16 @@ public class Serializer
     {
         try
         {
-            Document doc = new Serializer().serialize(new String("abc"));
+            String fileName = "../file.xml";
+            if (args.length > 0)
+            {
+                fileName = args[0];
+            }
+            Document doc = new Serializer().serialize(new TestClassChild());
             new XMLOutputter().output(doc, System.out);
             XMLOutputter outputter = new XMLOutputter();
             outputter.setFormat(Format.getPrettyFormat());
-            outputter.output(doc, new FileWriter("file.xml"));
+            outputter.output(doc, new FileWriter(fileName));
         }
         catch (IOException e)
         {
