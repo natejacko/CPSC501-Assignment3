@@ -14,26 +14,16 @@ public class Serializer
 {
     public static void main(String[] args)
     {
-        Document doc = new Serializer().serialize(new String("abc"));
         try
         {
+            Document doc = new Serializer().serialize(new String("abc"));
             new XMLOutputter().output(doc, System.out);
-        } 
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        
-        XMLOutputter outputter = new XMLOutputter();
-        outputter.setFormat(Format.getPrettyFormat());
-        
-        try
-        {
+            XMLOutputter outputter = new XMLOutputter();
+            outputter.setFormat(Format.getPrettyFormat());
             outputter.output(doc, new FileWriter("file.xml"));
-        } 
+        }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -65,6 +55,7 @@ public class Serializer
     		}
     		else if (objClass.isArray())
     		{
+    		    objElement.setAttribute("length", Integer.toString(Array.getLength(obj)));
     		    for (Element e : serializeArray(obj, doc, map))
     		    {
     		        objElement.addContent(e);
