@@ -5,30 +5,12 @@ import java.util.Scanner;
 
 import org.jdom2.Document;
 import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
 public class ObjectCreator
-{
-
-    public static void main(String[] args)
+{   
+    public static Object useObjectCreator()
     {
-        System.out.println("The following program creates user specified objects and serializes them");
         printObjectOptions();
-        Object obj = getObject(getObjectOption());
-        
-        Document doc = new Serializer().serialize(obj);
-        try
-        {
-            String fileName = "../file.xml";
-            new XMLOutputter().output(doc, System.out);
-            XMLOutputter outputter = new XMLOutputter();
-            outputter.setFormat(Format.getPrettyFormat());
-            outputter.output(doc, new FileWriter(fileName));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        return getObject(getObjectOption());
     }
     
     private static void printObjectOptions()

@@ -1,37 +1,11 @@
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
-
 import org.jdom2.*;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
 public class Serializer 
-{
-    public static void main(String[] args)
-    {
-        try
-        {
-            String fileName = "../file.xml";
-            if (args.length > 0)
-            {
-                fileName = args[0];
-            }
-            Document doc = new Serializer().serialize(new TestClassChild());
-            new XMLOutputter().output(doc, System.out);
-            XMLOutputter outputter = new XMLOutputter();
-            outputter.setFormat(Format.getPrettyFormat());
-            outputter.output(doc, new FileWriter(fileName));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
+{   
 	public Document serialize(Object obj)
 	{	
 		return serializeObject(obj, new Document(new Element("serialized")), new IdentityHashMap<Object, Integer>());
