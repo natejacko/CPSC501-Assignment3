@@ -165,6 +165,10 @@ public class Deserializer
         String value = e.getText();
         if (e.getName().equals("value"))
         {
+            if (value.equals("invalid"))
+            {
+                return null;
+            }
             if (c.equals(boolean.class))
             {
                 return Boolean.valueOf(value);

@@ -161,7 +161,16 @@ public class Serializer
 	private Element serializePrimitive(Object obj)
 	{
         Element valueElement = new Element("value");
-        valueElement.setText(obj.toString());
+        try
+        {    
+            valueElement.setText(obj.toString());
+        }
+        catch (IllegalDataException e)
+        {
+            System.out.println("Primitive value could not be written to XML, writing invalid...");
+            e.printStackTrace();
+            valueElement.setText("invalid");
+        }
         return valueElement;
 	}
 }
