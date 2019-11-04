@@ -74,6 +74,7 @@ public class Sender
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("Connected to output stream");
             out.writeObject(obj);
+            out.flush();
             System.out.println("Object written to output stream");  
             socket.close();
             System.out.println("Socket closed");

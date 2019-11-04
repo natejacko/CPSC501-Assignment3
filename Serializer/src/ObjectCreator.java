@@ -1,10 +1,6 @@
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import org.jdom2.Document;
-import org.jdom2.output.Format;
 public class ObjectCreator
 {   
     public static Object useObjectCreator()
@@ -18,11 +14,12 @@ public class ObjectCreator
         System.out.println("Select one of the following objects to create:");
         System.out.println("(1) Object with primitive fields");
         System.out.println("(2) Object with reference to another object");
-        System.out.println("(3) Object with array of a primitive");
-        System.out.println("(4) Object with array of references");
-        System.out.println("(5) Object with java.util.ArrayList of references");
-        System.out.println("(6) Null object");
-        System.out.print("Option (1,2,3,4,5,6): ");
+        System.out.println("(3) Two objects with circular reference to one another");
+        System.out.println("(4) Object with array of a ints or doubles");
+        System.out.println("(5) Object with array of references");
+        System.out.println("(6) Object with java.util.ArrayList of references");
+        System.out.println("(7) Null object");
+        System.out.print("Option (1, 2, 3, 4, 5, 6, 7): ");
     }
     
     private static char getObjectOption()
@@ -39,6 +36,7 @@ public class ObjectCreator
                 case '4':
                 case '5':
                 case '6':
+                case '7':
                     return option;
                 default:
                     System.out.println("Invalid option!");
@@ -59,12 +57,15 @@ public class ObjectCreator
                 obj = createReferenceObject();
                 break;
             case '3':
-                obj = createArrayOfPrimitivesObject();
+                obj = createCircularReferenceObject();
                 break;
             case '4':
-                obj = createArrayOfReferencesObject();
+                obj = createArrayOfPrimitivesObject();
                 break;
             case '5':
+                obj = createArrayOfReferencesObject();
+                break;
+            case '6':
                 obj = createArrayListOfReferencesObject();
                 break;
         }
@@ -93,56 +94,6 @@ public class ObjectCreator
         return bool;
     }
     
-    private static byte getByte()
-    {
-        Scanner scan = new Scanner(System.in);
-        byte b = 0;
-        while(true)
-        {
-            System.out.print("Byte value (-128 to 127): ");
-            String option = scan.nextLine();
-            if (option.equals(""))
-            {
-                break;
-            }
-            try
-            {
-                b = Byte.parseByte(option);
-                break;
-            }
-            catch (NumberFormatException e)
-            {
-                System.out.println("Invalid byte.");
-            }
-        }
-        return b;
-    }
-    
-    private static short getShort()
-    {
-        Scanner scan = new Scanner(System.in);
-        short s = 0;
-        while(true)
-        {
-            System.out.print("Short value: ");
-            String option = scan.nextLine();
-            if (option.equals(""))
-            {
-                break;
-            }
-            try
-            {
-                s = Short.parseShort(option);
-                break;
-            }
-            catch (NumberFormatException e)
-            {
-                System.out.println("Invalid short.");
-            }
-        }
-        return s;
-    }
-    
     private static int getInt()
     {
         Scanner scan = new Scanner(System.in);
@@ -166,31 +117,6 @@ public class ObjectCreator
             }
         }
         return i;
-    }
-    
-    private static long getLong()
-    {
-        Scanner scan = new Scanner(System.in);
-        long l = 0;
-        while(true)
-        {
-            System.out.print("Long value: ");
-            String option = scan.nextLine();
-            if (option.equals(""))
-            {
-                break;
-            }
-            try
-            {
-                l = Long.parseLong(option);
-                break;
-            }
-            catch (NumberFormatException e)
-            {
-                System.out.println("Invalid long.");
-            }
-        }
-        return l;
     }
     
     private static float getFloat()
@@ -287,15 +213,12 @@ public class ObjectCreator
     
     private static Object createPrimitivesObject()
     {
-        System.out.println("To create an object with primitive fields, please specify the value for each of the following primitives.");
+        System.out.println("\nTo create an object with primitive fields, please specify the value for each of the following primitives.");
         System.out.println("Press <enter> to leave as default value.");
         
         Primitives primObj = new Primitives();
         primObj.bool = getBoolean();
-        primObj.b = getByte();
-        primObj.s = getShort();
         primObj.i = getInt();
-        primObj.l = getLong();
         primObj.f = getFloat();
         primObj.d = getDouble();
         primObj.c = getChar();
@@ -304,33 +227,40 @@ public class ObjectCreator
     
     private static Object createReferenceObject()
     {
-        System.out.println("To create an object with reference to another object, please create a new object");
+        System.out.println("\nTo create an object with reference to another object, please create a new object");
         printObjectOptions();
         Reference obj = new Reference();
         obj.referenceObject = getObject(getObjectOption());
         return obj;
     }
     
+    private static Object createCircularReferenceObject()
+    {
+        System.out.println("\nTo create two objects with circular reference to one another, please specfiy the id of object one");
+        CircularReference obj1 = new CircularReference();
+        obj1.id = getInt();
+        System.out.println("Specify the id of object two");
+        CircularReference obj2 = new CircularReference();
+        obj2.id = getInt();
+        obj1.partner = obj2;
+        obj2.partner = obj1;
+        return obj1;
+    }
+    
     private static Object createArrayOfPrimitivesObject()
     {
-        System.out.println("To create an object with an array of primitives, please specify a primitive type.");
+        System.out.println("\nTo create an object with an array of primitives, please specify a primitive type.");
         Scanner scan = new Scanner(System.in);
         String option = "";
         boolean invalidOption = true;
         while (invalidOption)
         {
-            System.out.println("Types: boolean, byte, short, int, long, float, double, char");
+            System.out.println("Types: int, double");
             System.out.print("Type: ");
             switch(option = scan.nextLine())
             {
-                case "boolean":
-                case "byte":
-                case "short":
                 case "int":
-                case "long":
-                case "float":
                 case "double":
-                case "char":
                     invalidOption = false;
                     break;
                default:
@@ -345,69 +275,27 @@ public class ObjectCreator
         Object arrayPrimObj = null;
         switch(option)
         {
-            case "boolean":
-                arrayPrimObj = new ArrayOfBooleans();
-                ((ArrayOfBooleans) arrayPrimObj).array = new boolean[length];
-                break;
-            case "byte":
-                arrayPrimObj = new ArrayOfBytes();
-                ((ArrayOfBytes) arrayPrimObj).array = new byte[length];
-                break;
-            case "short":
-                arrayPrimObj = new ArrayOfShorts();
-                ((ArrayOfShorts) arrayPrimObj).array = new short[length];
-                break;
             case "int":
                 arrayPrimObj = new ArrayOfInts();
                 ((ArrayOfInts) arrayPrimObj).array = new int[length];
-                break;
-            case "long":
-                arrayPrimObj = new ArrayOfLongs();
-                ((ArrayOfLongs) arrayPrimObj).array = new long[length];
-                break;
-            case "float":
-                arrayPrimObj = new ArrayOfFloats();
-                ((ArrayOfFloats) arrayPrimObj).array = new float[length];
                 break;
             case "double":
                 arrayPrimObj = new ArrayOfDoubles();
                 ((ArrayOfDoubles) arrayPrimObj).array = new double[length];
                 break;
-            case "char":
-                arrayPrimObj = new ArrayOfChars();
-                ((ArrayOfChars) arrayPrimObj).array = new char[length];
-                break;
         }
         
         for (int i = 0; i < length; i++)
         {
-            System.out.println("Create a new primitive for index " + i);
+            System.out.println("\nCreate a new primitive for index " + i);
             System.out.println("Press <enter> to leave as default value.");
             switch(option)
             {
-                case "boolean":
-                    ((ArrayOfBooleans) arrayPrimObj).array[i] = getBoolean();
-                    break;
-                case "byte":
-                    ((ArrayOfBytes) arrayPrimObj).array[i] = getByte();
-                    break;
-                case "short":
-                    ((ArrayOfShorts) arrayPrimObj).array[i] = getShort();
-                    break;
                 case "int":
                     ((ArrayOfInts) arrayPrimObj).array[i] = getInt();
                     break;
-                case "long":
-                    ((ArrayOfLongs) arrayPrimObj).array[i] = getLong();
-                    break;
-                case "float":
-                    ((ArrayOfFloats) arrayPrimObj).array[i] = getFloat();
-                    break;
                 case "double":
                     ((ArrayOfDoubles) arrayPrimObj).array[i] = getDouble();
-                    break;
-                case "char":
-                    ((ArrayOfChars) arrayPrimObj).array[i] = getChar();
                     break;
             }
         }
@@ -417,7 +305,7 @@ public class ObjectCreator
     
     private static Object createArrayOfReferencesObject()
     {
-        System.out.println("To create an object with an array of references, please specify an array size");
+        System.out.println("\nTo create an object with an array of references, please specify an array size");
         System.out.print("Length: ");
         Scanner scan = new Scanner(System.in);
         int length = getLength();
@@ -427,7 +315,7 @@ public class ObjectCreator
         
         for (int i = 0; i < length; i++)
         {
-            System.out.println("Create a new object for index " + i);
+            System.out.println("\nCreate a new object for index " + i);
             printObjectOptions();
             arrayRefObj.references[i] = getObject(getObjectOption());
         }
@@ -437,7 +325,7 @@ public class ObjectCreator
     
     private static Object createArrayListOfReferencesObject()
     {
-        System.out.println("To create an object with java.util.ArrayList of references, continually create new objects.");
+        System.out.println("\nTo create an object with java.util.ArrayList of references, continually create new objects.");
         ArrayListOfReferences arraylistRefObj = new ArrayListOfReferences();
         arraylistRefObj.references = new ArrayList<Object>();
         Scanner scan = new Scanner(System.in);
@@ -448,7 +336,7 @@ public class ObjectCreator
             option = scan.nextLine();
             if (option.equals("next"))
             {
-                System.out.println("Create a new object");
+                System.out.println("\nCreate a new object");
                 printObjectOptions();
                 arraylistRefObj.references.add(getObject(getObjectOption()));
                 continue;

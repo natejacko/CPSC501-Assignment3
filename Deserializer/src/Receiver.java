@@ -1,4 +1,10 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import org.jdom2.Document;
@@ -38,10 +44,46 @@ public class Receiver
             System.out.println("----------------------------------------");
             System.out.println("Visualizing object (to stdout and in file deserialized.txt)");
             System.out.println("----------------------------------------");
-            // TODO use a modified version of assignment 2 here
+            runInspection("deserialized.txt", obj, true);
         } 
         catch (Exception e)
         {
+            e.printStackTrace();
+        }
+    }
+    
+    // Modified driver code given for assignment 2: http://pages.cpsc.ucalgary.ca/~hudsonj/CPSC501F19/A2Code/
+    private static void runInspection(String filename, Object obj, boolean recursive) 
+    {
+        try 
+        {
+            PrintStream old = System.out;
+            File file = new File(filename);
+            FileOutputStream fos = new FileOutputStream(file);
+            PrintStream ps = new PrintStream(fos);
+            System.setOut(ps);
+            new Inspector().inspect(obj, recursive);
+            ps.flush();
+            fos.flush();
+            ps.close();
+            fos.close();
+            System.setOut(old);
+            // Additionally print file to console
+            BufferedReader in = new BufferedReader(new FileReader(filename));
+            String line = null;
+            while((line = in.readLine()) != null)
+            {
+                System.out.println(line);
+            }
+            in.close();
+        } 
+        catch (IOException ioe) 
+        {
+            System.err.println("Unable to open file: " + filename);
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Unable to completely run test: " + obj);
             e.printStackTrace();
         }
     }

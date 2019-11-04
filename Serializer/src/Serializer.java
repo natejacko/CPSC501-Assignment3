@@ -62,12 +62,15 @@ public class Serializer
     		               e.printStackTrace();
     		           }
     		           Element fieldContents = null;
-    		           // Don't actually serialize the value of transient fields
+    		           // Serialize transient. If respecting native Java serialization,
+    		           // uncomment the following if statement and change the next if statement to else if
+    		           /*
     		           if (Modifier.isTransient(f.getModifiers()))
     		           {
     		               fieldContents = new Element("transient");
     		           }
-    		           else if (fieldType.isPrimitive())
+    		           */
+    		           if (fieldType.isPrimitive())
     		           {
     		               fieldContents = serializePrimitive(fieldObject);
     		           }

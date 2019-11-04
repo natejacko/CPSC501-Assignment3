@@ -14,34 +14,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 public class Deserializer
-{
-
-    public static void main(String[] args)
-    {
-        try
-        {
-            String fileName = "../file.xml";
-            if (args.length > 0)
-            {
-                fileName = args[0];
-            }
-            SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(new File(fileName));
-            Object obj = new Deserializer().deserialize(doc);
-            
-            // Complete the cycle and re-serialize the deserialized object to compare 
-            doc = new Serializer().serialize(obj);
-            new XMLOutputter().output(doc, System.out);
-            XMLOutputter outputter = new XMLOutputter();
-            outputter.setFormat(Format.getPrettyFormat());
-            outputter.output(doc, new FileWriter("../out.xml"));
-        }
-        catch (IOException | JDOMException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
+{    
     public Object deserialize(Document doc)
     {
         List<Element> elements = doc.getRootElement().getChildren();
@@ -104,6 +77,7 @@ public class Deserializer
     
     private void deserializeFields(HashMap<String, Object> instances, List<Element> elements)
     {
+        // Note: Traversal up fields into superclass is not supported
         for (Element e : elements)
         {
            Object obj = instances.get(e.getAttributeValue("id"));
@@ -114,15 +88,16 @@ public class Deserializer
            }
            
            Class objClass = obj.getClass();
+           // Deserialize transient. If respecting native Java deserialization,
+           // uncomment the following if statement
+           /*
            if (Modifier.isTransient(objClass.getModifiers()))
            {
                continue;
            }
+           */
            
            List<Element> children = e.getChildren();
-           // TODO
-           // If traversal up superclass to set inherited fields, may need to utilize declaringclass attribute
-           // instead of just using the object class
            if (objClass.isArray())
            {
                for (int i = 0; i < Array.getLength(obj); i++)
@@ -139,10 +114,14 @@ public class Deserializer
                    try
                    {
                        Field f = objClass.getDeclaredField(fieldName);
+                       // Deserialize transient. If respecting native Java deserialization,
+                       // uncomment the following if statement
+                       /*
                        if (Modifier.isTransient(f.getModifiers()))
                        {
                            continue;
                        }
+                       */
                        if (!Modifier.isPublic(f.getModifiers()))
                        {
                            f.setAccessible(true);
@@ -165,6 +144,7 @@ public class Deserializer
         String value = e.getText();
         if (e.getName().equals("value"))
         {
+            // Invalid case will only occur if the char encoding was not supported in XML format
             if (value.equals("invalid"))
             {
                 return null;
