@@ -53,18 +53,19 @@ public class Inspector
 		int mod = c.getModifiers();
 		printWithTabs(" Modifiers: " + Modifier.toString(mod), depth);
     	
-    	inspectSuperClass(c, obj, recursive, depth);
+		// REMOVE UNEEDED INSPECTION
+    	//inspectSuperClass(c, obj, recursive, depth);
     	
-    	inspectInterfaces(c, obj, recursive, depth);
+    	//inspectInterfaces(c, obj, recursive, depth);
     	
-    	inspectConstructors(c, obj, depth);
+    	//inspectConstructors(c, obj, depth);
     	
-    	inspectMethods(c, obj, depth);
+    	//inspectMethods(c, obj, depth);
     	
     	inspectFields(c, obj, recursive, depth);
     	
     }
-    
+    /*
     public void inspectSuperClass(Class c, Object obj, boolean recursive, int depth)
     {
 		// Type checking
@@ -200,6 +201,7 @@ public class Inspector
 	    	}
 		}
     }
+    */
     
     public void inspectFields(Class c, Object obj, boolean recursive, int depth)
     {
@@ -258,15 +260,15 @@ public class Inspector
 	    		{
 	    			if (recursive)
 	    			{
-	    				printWithTabs(" Value:", depth);
-	    				
 	    				// If recursing, don't recurse into already inspected Objects as to avoid circular references
 	    				if (inspectedObjects.contains(fieldObj))
     			        {
+	    				    printWithTabs(" Reference value: " + fieldType.getName() + "@" + Integer.toHexString(System.identityHashCode(fieldObj)) , depth);
 	    				    printWithTabs(" Object already inspected", depth);
     			            return;
 			            }
 	    				
+	    				printWithTabs(" Value:", depth); 
 	    				inspectClass(fieldType, fieldObj, recursive, depth + 1);
 	    			}
 	    			else
@@ -324,15 +326,15 @@ public class Inspector
 			{
     			if (recursive)
     			{
-    				printWithTabsAndSpaces(i + ":" , depth, arrDepth);
-    				
                     // If recursing, don't recurse into already inspected Objects as to avoid circular references
     		        if (inspectedObjects.contains(arrayObj))
     		        {
+    		            printWithTabsAndSpaces(i + ": " + arrayObj.getClass().getName() + "@" + arrayObj.hashCode() , depth, arrDepth);
     		            printWithTabsAndSpaces("Object already inspected", depth, arrDepth);
     		            return;
     		        }
-    				
+    		        
+                    printWithTabsAndSpaces(i + ":" , depth, arrDepth);
     				inspectClass(arrayObj.getClass(), arrayObj, recursive, depth + 1);
     			}
     			else

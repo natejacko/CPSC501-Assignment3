@@ -41,28 +41,32 @@ public class Sender
             Integer.parseInt(args[2]);
         }
        
-        System.out.println("The following program creates user specified objects, serializes them, and sends them over a network to a deserializer");
-        System.out.println("Firstly, create an object as instructed.");
-        System.out.println("----------------------------------------");
-        Object obj = ObjectCreator.useObjectCreator();
-        System.out.println("----------------------------------------");
-        System.out.println("Serializing object. XML located at " + outXMLFilePath);
-        Document doc = new Serializer().serialize(obj);
-        try
+        while(true)
         {
-            XMLOutputter outputter = new XMLOutputter();
-            outputter.setFormat(Format.getPrettyFormat());
-            outputter.output(doc, new FileWriter(outXMLFilePath));
+            System.out.println("The following program creates user specified objects, serializes them, and sends them over a network to a deserializer");
+            System.out.println("Firstly, create an object as instructed.");
+            System.out.println("----------------------------------------");
+            Object obj = ObjectCreator.useObjectCreator();
+            System.out.println("----------------------------------------");
+            System.out.println("Serializing object. XML located at " + outXMLFilePath);
+            Document doc = new Serializer().serialize(obj);
+            try
+            {
+                XMLOutputter outputter = new XMLOutputter();
+                outputter.setFormat(Format.getPrettyFormat());
+                outputter.output(doc, new FileWriter(outXMLFilePath));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            System.out.println("----------------------------------------");
+            System.out.println("Sending serialized object");
+            System.out.println("----------------------------------------");
+            sendObject(doc, serverHostname, serverPort);
+            System.out.println("----------------------------------------");
+            System.out.println("Looping... Type ^C to quit");
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        System.out.println("----------------------------------------");
-        System.out.println("Sending serialized object");
-        System.out.println("----------------------------------------");
-        sendObject(doc, serverHostname, serverPort);
-        System.out.println("----------------------------------------");
     }
     
     private static void sendObject(Object obj, String hostname, int port)

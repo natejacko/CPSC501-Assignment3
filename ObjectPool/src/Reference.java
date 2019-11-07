@@ -1,4 +1,4 @@
 public class Reference
 {
-    public Object referenceObject;
+    public Primitives referenceObject;
 }

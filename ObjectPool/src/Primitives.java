@@ -4,5 +4,5 @@ public class Primitives
     public int i;
     public float f;
     public double d;
-    public char c;
+    public char c = 'a';
 }

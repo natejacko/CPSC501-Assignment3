@@ -13,11 +13,11 @@ public class ObjectCreator
     {
         System.out.println("Select one of the following objects to create:");
         System.out.println("(1) Object with primitive fields");
-        System.out.println("(2) Object with reference to another object");
+        System.out.println("(2) Object with reference to (1) - object with primitive fields");
         System.out.println("(3) Two objects with circular reference to one another");
         System.out.println("(4) Object with array of a ints or doubles");
-        System.out.println("(5) Object with array of references");
-        System.out.println("(6) Object with java.util.ArrayList of references");
+        System.out.println("(5) Object with array of references to (1) - object with primitive fields");
+        System.out.println("(6) Object with java.util.ArrayList of references to (1) - object with primitive fields");
         System.out.println("(7) Null object");
         System.out.print("Option (1, 2, 3, 4, 5, 6, 7): ");
     }
@@ -227,10 +227,9 @@ public class ObjectCreator
     
     private static Object createReferenceObject()
     {
-        System.out.println("\nTo create an object with reference to another object, please create a new object");
-        printObjectOptions();
+        System.out.println("\nTo create an object with reference to (1) - object with primitive fields, create object (1)");
         Reference obj = new Reference();
-        obj.referenceObject = getObject(getObjectOption());
+        obj.referenceObject = (Primitives) createPrimitivesObject();
         return obj;
     }
     
@@ -305,19 +304,34 @@ public class ObjectCreator
     
     private static Object createArrayOfReferencesObject()
     {
-        System.out.println("\nTo create an object with an array of references, please specify an array size");
+        System.out.println("\nTo create an object with array of references to (1) - object with primitive fields, please specify a length");
         System.out.print("Length: ");
         Scanner scan = new Scanner(System.in);
         int length = getLength();
         
         ArrayOfReferences arrayRefObj = new ArrayOfReferences();
-        arrayRefObj.references = new Object[length];
-        
+        arrayRefObj.references = new Primitives[length];
+   
+        String option = "";
         for (int i = 0; i < length; i++)
         {
-            System.out.println("\nCreate a new object for index " + i);
-            printObjectOptions();
-            arrayRefObj.references[i] = getObject(getObjectOption());
+            while(true)
+            {
+                System.out.println("Type next to create a new Primitives object, null for null object");
+                option = scan.nextLine();
+                if (option.equals("next"))
+                {
+                    System.out.println("\nCreate a new object for index " + i);
+                    arrayRefObj.references[i] = (Primitives) createPrimitivesObject();
+                    break;
+                }
+                else if (option.equals("null"))
+                {
+                    arrayRefObj.references[i] = null;
+                    break;
+                }
+                System.out.println("Invalid option.");
+            }
         }
         
         return arrayRefObj;
@@ -325,20 +339,24 @@ public class ObjectCreator
     
     private static Object createArrayListOfReferencesObject()
     {
-        System.out.println("\nTo create an object with java.util.ArrayList of references, continually create new objects.");
+        System.out.println("\nTo create an object with java.util.ArrayList of references to (1) - object with primitive fields, continually create new objects");
         ArrayListOfReferences arraylistRefObj = new ArrayListOfReferences();
-        arraylistRefObj.references = new ArrayList<Object>();
+        arraylistRefObj.references = new ArrayList<Primitives>();
         Scanner scan = new Scanner(System.in);
         String option = "";
         while (true)
         {
-            System.out.println("Type next to create a new object or <enter> to finish");
+            System.out.println("Type next to create a new Primitives object, null for null object, or <enter> to finish");
             option = scan.nextLine();
             if (option.equals("next"))
             {
                 System.out.println("\nCreate a new object");
-                printObjectOptions();
-                arraylistRefObj.references.add(getObject(getObjectOption()));
+                arraylistRefObj.references.add((Primitives) createPrimitivesObject());
+                continue;
+            }
+            else if (option.equals("null"))
+            {
+                arraylistRefObj.references.add(null);
                 continue;
             }
             else if (option.equals(""))

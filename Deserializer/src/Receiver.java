@@ -31,20 +31,24 @@ public class Receiver
             System.out.println("To close server, type ^c");
             ServerSocket serverSocket = new ServerSocket(port);
             System.out.println("Server socket created on port " + port);
-            Socket socket = serverSocket.accept();
-            System.out.println("Receieved connection");
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-            System.out.println("Connected to input stream");
-            Document doc = (Document) in.readObject();
-            System.out.println("Object read from input stream");
-            System.out.println("----------------------------------------");
-            System.out.println("Deserializing received object");
-            System.out.println("----------------------------------------");
-            Object obj = new Deserializer().deserialize(doc);
-            System.out.println("----------------------------------------");
-            System.out.println("Visualizing object (to stdout and in file deserialized.txt)");
-            System.out.println("----------------------------------------");
-            runInspection("deserialized.txt", obj, true);
+            while(true)
+            {
+                Socket socket = serverSocket.accept();
+                System.out.println("Receieved connection");
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                System.out.println("Connected to input stream");
+                Document doc = (Document) in.readObject();
+                System.out.println("Object read from input stream");
+                System.out.println("----------------------------------------");
+                System.out.println("Deserializing received object");
+                System.out.println("----------------------------------------");
+                Object obj = new Deserializer().deserialize(doc);
+                System.out.println("----------------------------------------");
+                System.out.println("Visualizing object (to stdout and in file deserialized.txt)");
+                System.out.println("----------------------------------------");
+                runInspection("deserialized.txt", obj, true);
+                System.out.println("Looping... Type ^C to quit");
+            }
         } 
         catch (Exception e)
         {

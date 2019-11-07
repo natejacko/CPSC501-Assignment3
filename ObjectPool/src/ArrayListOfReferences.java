@@ -2,5 +2,5 @@ import java.util.ArrayList;
 
 public class ArrayListOfReferences
 {
-    public ArrayList<Object> references;
+    public ArrayList<Primitives> references;
 }

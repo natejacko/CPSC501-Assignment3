@@ -1,4 +1,4 @@
 public class ArrayOfReferences
 {
-    public Object[] references;
+    public Primitives[] references;
 }
