@@ -4,6 +4,8 @@ import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import org.jdom2.*;
 
+// Serialization to XML code based off code Java Reflection in Action textbook by Ira R. Forman and Nate Forman
+// Textbook found here: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.116.5796&rep=rep1&type=pdf
 public class Serializer 
 {   
 	public Document serialize(Object obj)
