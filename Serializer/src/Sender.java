@@ -1,6 +1,9 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 import org.jdom2.Document;
@@ -34,11 +37,14 @@ public class Sender
         }
         if (args.length == 2)
         {
+            outXMLFilePath = args[0];
             serverHostname = args[1];
         }
         if (args.length == 3)
         {
-            Integer.parseInt(args[2]);
+            outXMLFilePath = args[0];
+            serverHostname = args[1];
+            serverPort = Integer.parseInt(args[2]);
         }
        
         while(true)
@@ -48,24 +54,34 @@ public class Sender
             System.out.println("----------------------------------------");
             Object obj = ObjectCreator.useObjectCreator();
             System.out.println("----------------------------------------");
-            System.out.println("Serializing object. XML located at " + outXMLFilePath);
+            System.out.println("Serializing object (to stdout and in file " + outXMLFilePath + ")");
+            System.out.println("----------------------------------------");
             Document doc = new Serializer().serialize(obj);
             try
             {
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setFormat(Format.getPrettyFormat());
                 outputter.output(doc, new FileWriter(outXMLFilePath));
+                // Additionally print file to console
+                BufferedReader in = new BufferedReader(new FileReader(outXMLFilePath));
+                String line = null;
+                while((line = in.readLine()) != null)
+                {
+                    System.out.println(line);
+                }
+                in.close();
             }
             catch (IOException e)
             {
                 e.printStackTrace();
             }
             System.out.println("----------------------------------------");
-            System.out.println("Sending serialized object");
+            System.out.println("Sending serialized object to " + serverHostname + " at port " + serverPort);
             System.out.println("----------------------------------------");
             sendObject(doc, serverHostname, serverPort);
             System.out.println("----------------------------------------");
             System.out.println("Looping... Type ^C to quit");
+            System.out.println("----------------------------------------");
         }
     }
     
@@ -73,7 +89,7 @@ public class Sender
     {
         try
         {
-            Socket socket = new Socket(hostname, port);
+            Socket socket = new Socket(InetAddress.getByName(hostname), port);
             System.out.println("Socket connected at " + hostname + ":" + port);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("Connected to output stream");

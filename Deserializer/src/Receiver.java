@@ -41,13 +41,14 @@ public class Receiver
                 System.out.println("Object read from input stream");
                 System.out.println("----------------------------------------");
                 System.out.println("Deserializing received object");
-                System.out.println("----------------------------------------");
                 Object obj = new Deserializer().deserialize(doc);
                 System.out.println("----------------------------------------");
                 System.out.println("Visualizing object (to stdout and in file deserialized.txt)");
                 System.out.println("----------------------------------------");
                 runInspection("deserialized.txt", obj, true);
+                System.out.println("----------------------------------------");
                 System.out.println("Looping... Type ^C to quit");
+                System.out.println("----------------------------------------");
             }
         } 
         catch (Exception e)
